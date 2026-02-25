@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Panels{% endblock %}
+{% block content %}
+<form method="get" class="grid cols-3">
+  <input type="text" name="q" value="{{ q }}" placeholder="Search building, panel, description" />
+  <select name="type">
+    <option value="">All types</option>
+    {% for t in PANEL_TYPES.keys() %}
+      <option value="{{t}}" {% if panel_type==t %}selected{% endif %}>{{ t }}</option>
+    {% endfor %}
+  </select>
+  <select name="sort">
+    <option value="designation" {% if sort=='designation' %}selected{% endif %}>Sort: Designation</option>
+    <option value="circuit_count" {% if sort=='circuit_count' %}selected{% endif %}>Sort: Circuit count</option>
+    <option value="type" {% if sort=='type' %}selected{% endif %}>Sort: Type</option>
+  </select>
+  <div><button class="btn" type="submit">Apply</button></div>
+</form>
+
+{% for bname, plist in groups.items() %}
+  <div class="building-row">
+    <div class="building" onclick="this.nextElementSibling.classList.toggle('hide')">{{ bname }}</div>
+    <div>
+      {% for p in plist %}
+        <div class="panel-row">
+          <div>
+            <div class="panel-title"><a href="/panel/{{p.id}}">{{ p.designation }}</a></div>
+            <div class="muted">{{ p.location or '' }} · {{ p.voltage or '' }}</div>
+          </div>
+          <div><span class="tag {{ p.panel_type|lower().replace(' ','-') }}">{{ p.panel_type }}</span></div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endfor %}
+
+<script>
+if (window.innerWidth < 720) {
+  document.querySelectorAll('.building-row > div:nth-child(2)').forEach(d => d.classList.add('hide'))
+}
+</script>
+{% endblock %}

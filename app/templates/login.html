@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Sign in{% endblock %}
+{% block content %}
+<div class="grid cols-3">
+  <div class="card" style="grid-column: span 2;">
+    <h2>Sign in</h2>
+    <form method="post">
+      <label>Email</label>
+      <input type="text" name="email" placeholder="you@vch.ca" />
+      <label>Password</label>
+      <input type="password" name="password" />
+      <div style="margin-top:12px"><button class="btn primary" type="submit">Sign in</button></div>
+    </form>
+  </div>
+  <div class="card">
+    <h3>About</h3>
+    <p>VGH Electrical — mobile-friendly with QR codes, print layouts, and change requests.</p>
+  </div>
+</div>
+{% endblock %}

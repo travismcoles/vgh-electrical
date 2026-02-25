@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}VGH Electrical{% endblock %}</title>
+  <style>
+    :root { --blue: #0072bb; --green: #a6ce39; --vital:#d7263d; --delayed:#1e88e5; --ups:#ff7f11; --hydro:#111; }
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:0;color:#222}
+    header{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid #ddd;position:sticky;top:0;background:#fff;z-index:10}
+    header .logo{height:26px}
+    header .title{font-weight:700}
+    main{padding:16px}
+    .btn{display:inline-block;padding:8px 12px;border:1px solid #ccc;border-radius:6px;text-decoration:none;color:#111;background:#f8f8f8;cursor:pointer}
+    .btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+    .btn.small{padding:4px 8px;font-size:12px}
+    input[type=text],select,textarea{padding:8px;border:1px solid #ccc;border-radius:6px;width:100%;box-sizing:border-box}
+    .grid{display:grid;gap:12px}.grid.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .card{border:1px solid #ddd;border-radius:8px;padding:12px}
+    .muted{color:#666}
+    .tag{display:inline-block;padding:2px 6px;border-radius:4px;font-size:12px;color:#fff}
+    .tag.hydro{background:var(--hydro)}.tag.vital{background:var(--vital)}.tag.delayed{background:var(--delayed)}.tag.ups{background:var(--ups)}
+    .building{margin-bottom:8px;font-weight:600;cursor:pointer}
+    .building-row{border:1px solid #eee;border-radius:8px;margin:8px 0}
+    .panel-row{padding:10px 12px;border-top:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center}
+    .panel-row:first-child{border-top:none}
+    @media (max-width:720px){.grid.cols-3{grid-template-columns:1fr}}
+  </style>
+  {% block head_extra %}{% endblock %}
+</head>
+<body>
+<header>
+  <img class="logo" src="/static/logo.png" alt="VCH"/>
+  <div class="title">VGH Electrical</div>
+  <div style="margin-left:auto">
+    <a class="btn small" href="/">Panels</a>
+    <a class="btn small" href="/users">Users</a>
+    <a class="btn small" href="/logout">Logout</a>
+  </div>
+</header>
+<main>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}<ul>{% for category,message in messages %}<li class="muted">{{ message }}</li>{% endfor %}</ul>{% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+</body></html>

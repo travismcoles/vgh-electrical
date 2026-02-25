@@ -1,0 +1,30 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Print {{ panel.designation }}</title>
+<style>
+ body{font-family:Arial,sans-serif;margin:16px}
+ .banner{color:#fff;padding:6px 10px;border-radius:8px;margin-bottom:8px;font-weight:700;font-size:20px}
+ .cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+ .row{display:grid;grid-template-columns:28px 1fr 42px;gap:6px;font-size:12px}
+ .hdr{font-weight:700;border-bottom:1px solid #333;margin-bottom:4px}
+ .footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:10px}
+ .muted{color:#666}
+ @page{size:A4;margin:8mm}
+ @media print{.noprint{display:none}}
+</style></head>
+<body>
+  <div class="banner" style="background: {% if panel.panel_type=='Hydro' %}#111{% elif panel.panel_type=='Vital' %}#d7263d{% elif panel.panel_type=='Delayed Vital' %}#1e88e5{% else %}#ff7f11{% endif %}">{{ panel.designation }}</div>
+  <div class="cols">
+    <div>
+      <div class="row hdr"><div>#</div><div>Description</div><div>A</div></div>
+      {% for n,c in odd_rows %}<div class="row"><div>{{ n }}</div><div>{{ c.description or '' }}</div><div>{{ c.amperage or '' }}{% if c.poles and c.poles>1 %}<sup>{{ c.poles }}P</sup>{% endif %}</div></div>{% endfor %}
+    </div>
+    <div>
+      <div class="row hdr"><div>#</div><div>Description</div><div>A</div></div>
+      {% for n,c in even_rows %}<div class="row"><div>{{ n }}</div><div>{{ c.description or '' }}</div><div>{{ c.amperage or '' }}{% if c.poles and c.poles>1 %}<sup>{{ c.poles }}P</sup>{% endif %}</div></div>{% endfor %}
+    </div>
+  </div>
+  {% if panel.notes %}<div style="margin-top:6px;font-size:11px"><strong>Notes:</strong> {{ panel.notes }}</div>{% endif %}
+  <div class="footer">
+    <div class="muted">Printed: {{ printed_at.strftime('%Y-%m-%d %H:%M') }} | Last Edited: {{ panel.updated_at.strftime('%Y-%m-%d %H:%M') if panel.updated_at else '' }}</div>
+    <div><img src="/api/qr/panel/{{panel.id}}.png" alt="QR" style="height:48px;width:48px"/></div>
+  </div>
+</body></html>

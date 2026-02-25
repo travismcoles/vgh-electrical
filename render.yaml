@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: vgh-electrical
+    env: docker
+    plan: free
+    autoDeploy: true
+    healthCheckPath: /
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true

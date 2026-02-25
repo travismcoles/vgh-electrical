@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block head_extra %}
+<style>
+  .banner{color:#fff;padding:8px 12px;border-radius:8px;margin-bottom:12px}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .row{display:grid;grid-template-columns:36px 1fr 70px 50px;gap:8px;padding:4px 0;border-bottom:1px solid #f0f0f0;align-items:center}
+  .notes{background:#fff8d8;border:1px solid #f0e0a0;border-radius:6px;padding:8px}
+  @media(max-width:900px){.cols{grid-template-columns:1fr}}
+</style>
+{% endblock %}
+{% block content %}
+<div class="banner" style="background: {% if panel.panel_type=='Hydro' %}#111{% elif panel.panel_type=='Vital' %}#d7263d{% elif panel.panel_type=='Delayed Vital' %}#1e88e5{% else %}#ff7f11{% endif %}">
+  <div style="font-size:20px;font-weight:700;">{{ panel.designation }}</div>
+  <div style="font-size:12px;opacity:0.9">{{ panel.panel_type }}</div>
+</div>
+<form method="post" action="/panel/{{panel.id}}/edit">
+  <div class="grid cols-3">
+    <div class="card">
+      <label>Location</label><input type="text" name="location" value="{{ panel.location or '' }}" {% if not can_edit %}disabled{% endif %}/>
+      <label>Voltage</label><input type="text" name="voltage" value="{{ panel.voltage or '' }}" {% if not can_edit %}disabled{% endif %}/>
+      <label>Fed From</label><input type="text" name="fed_from" value="{{ panel.fed_from or '' }}" {% if not can_edit %}disabled{% endif %}/>
+      <label>Fuse/Breaker</label><input type="text" name="fuse_breaker" value="{{ panel.fuse_breaker or '' }}" {% if not can_edit %}disabled{% endif %}/>
+      <label>Panel Type</label>
+      <select name="panel_type" {% if not can_edit %}disabled{% endif %}>
+        {% for t in PANEL_TYPES.keys() %}<option value="{{t}}" {% if panel.panel_type==t %}selected{% endif %}>{{ t }}</option>{% endfor %}
+      </select>
+      <label>Number of Circuits</label><input type="text" name="circuit_count" value="{{ panel.circuit_count or 42 }}" {% if not can_edit %}disabled{% endif %}/>
+      <label>Description</label><input type="text" name="description" value="{{ panel.description or '' }}" {% if not can_edit %}disabled{% endif %}/>
+      <label>Notes</label><textarea name="notes" rows="4" {% if not can_edit %}disabled{% endif %}>{{ panel.notes or '' }}</textarea>
+      <div style="margin-top:8px"><a class="btn" href="/panel/{{panel.id}}/print" target="_blank">Print</a> <a class="btn" href="/panel/{{panel.id}}/qr-labels" target="_blank">QR Labels</a> {% if can_edit %}<button class="btn primary" type="submit">Save</button>{% endif %}</div>
+    </div>
+    <div class="card" style="grid-column: span 2;">
+      <div class="cols">
+        <div>
+          <div class="row" style="font-weight:600"><div>#</div><div>Description</div><div>A</div><div>P</div></div>
+          {% for n, group in odd_rows %}
+          {% set first = group[0] %}
+          <div class="row"><div>{{ n }}</div><div><input type="text" name="c_desc_{{first.number}}" value="{{ first.description or '' }}" {% if not can_edit %}disabled{% endif %}/></div><div><input type="text" name="c_amp_{{first.number}}" value="{{ first.amperage or '' }}" {% if not can_edit %}disabled{% endif %}/></div><div><select name="c_poles_{{first.number}}" {% if not can_edit %}disabled{% endif %}>{% for p in [1,2,3] %}<option value="{{p}}" {% if first.poles==p %}selected{% endif %}>{{p}}P</option>{% endfor %}</select></div></div>
+          {% endfor %}
+        </div>
+        <div>
+          <div class="row" style="font-weight:600"><div>#</div><div>Description</div><div>A</div><div>P</div></div>
+          {% for n, group in even_rows %}
+          {% set first = group[0] %}
+          <div class="row"><div>{{ n }}</div><div><input type="text" name="c_desc_{{first.number}}" value="{{ first.description or '' }}" {% if not can_edit %}disabled{% endif %}/></div><div><input type="text" name="c_amp_{{first.number}}" value="{{ first.amperage or '' }}" {% if not can_edit %}disabled{% endif %}/></div><div><select name="c_poles_{{first.number}}" {% if not can_edit %}disabled{% endif %}>{% for p in [1,2,3] %}<option value="{{p}}" {% if first.poles==p %}selected{% endif %}>{{p}}P</option>{% endfor %}</select></div></div>
+          {% endfor %}
+        </div>
+      </div>
+      {% if panel.notes %}<div class="notes" style="margin-top:12px">{{ panel.notes }}</div>{% endif %}
+    </div>
+  </div>
+</form>
+{% endblock %}
