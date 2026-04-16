@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --vch-blue: #003865;
+  --vch-green: #78BE20;
+  --vch-light-blue: #0072CE;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.mono {
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+/* Print styles */
+@media print {
+  body { background: white !important; }
+  .no-print { display: none !important; }
+  .print-only { display: block !important; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 3px; }
+
+/* Panel type colors */
+.panel-hydro { border-left: 4px solid #1a1a1a; }
+.panel-vital { border-left: 4px solid #dc2626; }
+.panel-delayed { border-left: 4px solid #2563eb; }
+.panel-ups { border-left: 4px solid #ea580c; }

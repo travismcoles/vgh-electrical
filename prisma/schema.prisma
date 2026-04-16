@@ -1,0 +1,143 @@
+// This is your Prisma schema file
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String          @id @default(cuid())
+  name           String
+  email          String          @unique
+  password       String
+  role           String          @default("VIEW_ONLY")
+  active         Boolean         @default(true)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  changeRequests ChangeRequest[]
+  auditLogs      AuditLog[]
+}
+
+// Roles: ADMIN, CHARGEHAND, ELECTRICIAN, SUBCONTRACTOR, VIEW_ONLY
+
+model Building {
+  id        String   @id @default(cuid())
+  name      String
+  abbrev    String   @unique
+  panels    Panel[]
+  createdAt DateTime @default(now())
+}
+
+model Panel {
+  id             String          @id @default(cuid())
+  designation    String          @unique
+  buildingId     String
+  building       Building        @relation(fields: [buildingId], references: [id])
+  manufacturer   String?
+  description    String?
+  location       String?
+  voltage        String?
+  fedFrom        String?
+  main           String?
+  panelType      String          @default("HYDRO")
+  circuitCount   Int             @default(24)
+  notes          String?
+  circuits       Circuit[]
+  photos         Photo[]
+  slds           SLD[]
+  floorPlanMarks FloorPlanMark[]
+  changeRequests ChangeRequest[]
+  auditLogs      AuditLog[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+// PanelType: HYDRO, VITAL, DELAYED_VITAL, UPS
+
+model Circuit {
+  id            String   @id @default(cuid())
+  panelId       String
+  panel         Panel    @relation(fields: [panelId], references: [id], onDelete: Cascade)
+  circuitNumber Int
+  description   String?
+  amperage      String?
+  poles         Int      @default(1)
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([panelId, circuitNumber])
+}
+
+model Photo {
+  id        String   @id @default(cuid())
+  panelId   String
+  panel     Panel    @relation(fields: [panelId], references: [id], onDelete: Cascade)
+  filename  String
+  path      String
+  caption   String?
+  createdAt DateTime @default(now())
+}
+
+model SLD {
+  id        String   @id @default(cuid())
+  panelId   String
+  panel     Panel    @relation(fields: [panelId], references: [id], onDelete: Cascade)
+  filename  String
+  path      String
+  title     String?
+  createdAt DateTime @default(now())
+}
+
+model FloorPlan {
+  id        String          @id @default(cuid())
+  building  String
+  filename  String
+  path      String
+  floor     String?
+  marks     FloorPlanMark[]
+  createdAt DateTime        @default(now())
+}
+
+model FloorPlanMark {
+  id          String    @id @default(cuid())
+  floorPlanId String
+  floorPlan   FloorPlan @relation(fields: [floorPlanId], references: [id], onDelete: Cascade)
+  panelId     String
+  panel       Panel     @relation(fields: [panelId], references: [id], onDelete: Cascade)
+  x           Float
+  y           Float
+  createdAt   DateTime  @default(now())
+}
+
+model ChangeRequest {
+  id          String   @id @default(cuid())
+  panelId     String
+  panel       Panel    @relation(fields: [panelId], references: [id], onDelete: Cascade)
+  submittedBy String
+  user        User     @relation(fields: [submittedBy], references: [id])
+  type        String   // PANEL_EDIT, CIRCUIT_EDIT, ADD_CIRCUIT, ADD_PANEL
+  fieldName   String?
+  oldValue    String?
+  newValue    String?
+  description String?
+  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  reviewedBy  String?
+  reviewNote  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  panelId   String?
+  panel     Panel?   @relation(fields: [panelId], references: [id])
+  action    String
+  details   String?
+  createdAt DateTime @default(now())
+}
